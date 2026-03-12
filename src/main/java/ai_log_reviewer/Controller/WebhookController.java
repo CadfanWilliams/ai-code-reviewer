@@ -14,6 +14,8 @@ public class WebhookController {
         System.out.println("Webhook received");
         System.out.println("Event type: " + event);
         System.out.println("Payload: " + rawPayload);
+        //Turn into PullRequestEvent
+        //Send to prompt generator
         return ResponseEntity.ok().build();
     }
 }
