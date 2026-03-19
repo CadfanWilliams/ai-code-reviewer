@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PullRequestEvent(
         String action,
+
         @JsonProperty("pull_request")
         PullRequest pullRequest,
 
@@ -13,7 +14,7 @@ public record PullRequestEvent(
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record PullRequest(
-            String number,
+            int number,
             String title,
             String body,
 

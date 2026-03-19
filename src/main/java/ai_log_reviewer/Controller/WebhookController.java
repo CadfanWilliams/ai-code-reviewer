@@ -9,19 +9,15 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/webhook")
 public class WebhookController {
 
-    private final ObjectMapper objectMapper;
-
-    public WebhookController(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @PostMapping("/github")
     public ResponseEntity<Void> handle(
             @RequestHeader("X-GitHub-Event") String event,
-            @RequestBody String rawPayload) {
+            @RequestBody PullRequestEvent prEvent) {
         System.out.println("Webhook received");
-        PullRequestEvent pr = objectMapper.convertValue(rawPayload, PullRequestEvent.class);
-        System.out.printf("Hello %s. Thankyou for your pull request: %s I am now going to review it ", pr.repository().fullName(), pr.pullRequest().title());
+        System.out.println("Action: " + prEvent.action());
+        System.out.println("PR Title: " + prEvent.pullRequest().title());
+        System.out.println("Diff URL: " + prEvent.pullRequest().diffUrl());
+        System.out.println("Repo: " + prEvent.repository().fullName());
         return ResponseEntity.ok().build();
     }
 }
