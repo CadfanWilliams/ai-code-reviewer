@@ -10,6 +10,7 @@ public class AiLogReviewerApplication {
 		SpringApplication.run(AiLogReviewerApplication.class, args);
 		System.out.println("Listening for webhooks!");
 		System.out.println("Now this is a test!");
+		System.out.println("Double time!");
 	}
 
 }
