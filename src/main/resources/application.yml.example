@@ -1,0 +1,10 @@
+github:
+    token: <GITHUB_PAT_TOKEN>
+
+claude:
+    api-key: your_claude_key_here
+    model: claude-sonnet-4-20250514
+    max-tokens: 1000
+
+server:
+    port: 8081
