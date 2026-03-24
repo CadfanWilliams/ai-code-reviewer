@@ -21,6 +21,7 @@ public class GithubService {
     //Fetch git diff
 
     public String getDiff(String diffUrl) {
+        System.out.println("Diff URL: " + diffUrl);
         return webClient.get().uri(diffUrl).retrieve().bodyToMono(String.class).block();
     }
     //Fetch git issue

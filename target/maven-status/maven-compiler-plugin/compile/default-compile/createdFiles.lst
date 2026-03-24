@@ -1,1 +1,8 @@
-ai_log_reviewer/AiLogReviewerApplication.class
+ai_log_reviewer\Model\PullRequestEvent.class
+ai_log_reviewer\AiLogReviewerApplication.class
+ai_log_reviewer\Controller\WebhookController.class
+ai_log_reviewer\Model\PullRequestEvent$Repository.class
+ai_log_reviewer\Github\GithubCommentService.class
+ai_log_reviewer\Github\GithubService.class
+ai_log_reviewer\Model\PullRequestEvent$PullRequest.class
+ai_log_reviewer\review\PromptBuilder.class
