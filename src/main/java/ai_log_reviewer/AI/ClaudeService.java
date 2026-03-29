@@ -2,6 +2,7 @@ package ai_log_reviewer.AI;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -25,7 +26,7 @@ public class ClaudeService {
 
     public String review(String diff) {
         Map<String, Object> requestBody = Map.of(
-                "model", "claude-sonnet-4-20250514",
+                "model", "claude-sonnet-4-6",
                 "max_tokens", 1024,
                 "messages", List.of(
                         Map.of("role", "user", "content", buildPrompt(diff))
@@ -36,6 +37,17 @@ public class ClaudeService {
                 .uri("/v1/messages")
                 .bodyValue(requestBody)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    if (body.contains("credit balance is too low")) {
+                                        System.out.println("Claude API error: Credits too low");
+                                    } else {
+                                        System.out.println("Claude API error: " + body);
+                                    }
+                                    return reactor.core.publisher.Mono.empty();
+                                })
+                )
                 .bodyToMono(ClaudeResponse.class)
                 .map(response -> response.content().get(0).text())
                 .block();

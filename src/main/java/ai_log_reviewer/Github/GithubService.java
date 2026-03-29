@@ -21,11 +21,10 @@ public class GithubService {
                 .build();
     }
 
-    //Fetch git diff
-
     public String getDiff(String diffUrl) {
         return webClient.get().uri(diffUrl).retrieve().bodyToMono(String.class).block();
     }
-    //Fetch git issue
+
+    //TODO: add "getIssue" function which will grab the issue linked with the PR to give the LLM more context to review said PR
 
 }
