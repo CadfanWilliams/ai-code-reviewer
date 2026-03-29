@@ -2,7 +2,7 @@
 
 <details>
 
-<summary>Test Run Code review with Claude Sonnet 4.6</summary>
+<summary>Test Run 1</summary>
 
 I made a dummy pull request that was obviously incorrect and below is the statement Claude sonnet 4-6 made
 
@@ -80,6 +80,107 @@ No tests were added or modified in this PR. Given that even small changes to mod
 ---
 
 **Overall:** This PR should not be merged as-is. The debug print statements are the most pressing concern and suggest the change was not ready for review.
+
+</details>
+
+
+<details>
+
+<summary>Test Run 2 with actual code </summary>
+
+## Code Review
+
+### `GithubCommentService.java`
+
+#### ? Bugs / Correctness
+
+**Silent failure on 4xx errors** ? The `onStatus` handler swallows 4xx errors by returning `Mono.empty()`, which means the caller has no idea the comment failed. The `System.out.println("Review comment posted...")` will still execute even after a 401/403/404.
+
+```java
+// Current: misleading success log even on failure
+.onStatus(HttpStatusCode::is4xxClientError, response ->
+        response.bodyToMono(String.class)
+                .flatMap(error -> {
+                    System.out.println("Failed to post comment: " + error);
+                    return reactor.core.publisher.Mono.empty(); // ? swallows the error
+                })
+)
+// ...
+System.out.println("Review comment posted to PR #" + prNumber); // always runs
+```
+
+Fix: propagate an exception instead, and handle 5xx errors too.
+
+```java
+.onStatus(HttpStatusCode::is4xxClientError, response ->
+        response.bodyToMono(String.class)
+                .flatMap(error -> Mono.error(new RuntimeException("GitHub API error: " + error)))
+)
+.onStatus(HttpStatusCode::is5xxServerError, response ->
+        Mono.error(new RuntimeException("GitHub server error")))
+```
+
+**`repoFullName` not sanitised in URI** ? If `repoFullName` contains unexpected characters (e.g. spaces from a malformed event), the URL will be invalid. Use `UriComponentsBuilder` or the `uri(fn)` overload:
+
+```java
+.uri(uriBuilder -> uriBuilder
+    .scheme("https").host("api.github.com")
+    .path("/repos/{repo}/issues/{pr}/comments")
+    .build(repoFullName, prNumber))
+```
+
+---
+
+#### ?? Design / Quality
+
+**Blocking call in a reactive chain** ? `.block()` is acceptable for a simple synchronous controller, but it ties up a thread and defeats the purpose of using `WebClient`. Consider returning `Mono<Void>` from `postComment` and subscribing in the controller, or switch to `RestClient` if blocking is intentional.
+
+**`System.out.println` instead of a logger** ? Used throughout both files. Replace with SLF4J:
+
+```java
+private static final Logger log = LoggerFactory.getLogger(GithubCommentService.class);
+log.error("Failed to post comment: {}", error);
+```
+
+**Hardcoded base URL** ? `https://api.github.com` is hardcoded. Extract to a `@Value`-injected property to support GitHub Enterprise or testing.
+
+**Constructor over-builds the `WebClient`** ? `followRedirect(true)` is unusual for a JSON API; GitHub doesn't return redirects for comment endpoints. This adds unnecessary complexity and could mask redirect-based security issues.
+
+---
+
+### `WebhookController.java`
+
+#### ? Bugs / Correctness
+
+**No event type filtering** ? The handler processes every GitHub event (push, star, fork, etc.), but `prEvent.pullRequest()` will likely be `null` for non-PR events, causing a `NullPointerException`.
+
+```java
+// Add guard
+if (!"pull_request".equals(event)) {
+    return ResponseEntity.ok().build();
+}
+// Also check action: only review "opened" / "synchronize"
+if (!"opened".equals(prEvent.action()) && !"synchronize".equals(prEvent.action())) {
+    return ResponseEntity.ok().build();
+}
+```
+
+**No null checks on the diff or review** ? If `getDiff` returns `null`/empty or `claudeService.review` returns null, `postComment` will post an empty/null comment or throw.
+
+**Removed useful debug logging** ? The PR title and repo name logs were removed with no replacement. At minimum, add structured logging:
+
+```java
+log.info("Handling PR #{} on {}", prEvent.pullRequest().number(), prEvent.repository().fullName());
+```
+
+---
+
+### Test Coverage Gaps
+
+| Scenario | Covered? |
+|---|---|
+| 4xx response from GitHub API | ? |
+|
 
 </details>
 
