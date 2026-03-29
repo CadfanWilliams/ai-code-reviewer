@@ -3,6 +3,8 @@
 Test run #1
 I made a dummy pull request that was obviously incorrect and below is the statement Claude sonnet 4-6 made
 
+This was a small PR and I assume that it will scale will repo and PR size but this single call cost £0.01
+
 <details>
 
 <summary>Code Review #1 with Claude Sonnet 4.6</summary>
