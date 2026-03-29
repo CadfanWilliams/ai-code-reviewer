@@ -7,6 +7,8 @@ import ai_log_reviewer.Model.PullRequestEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/webhook")
 public class WebhookController {
@@ -28,9 +30,14 @@ public class WebhookController {
             @RequestHeader("X-GitHub-Event") String event,
             @RequestBody PullRequestEvent prEvent) {
         System.out.println("Webhook received");
-        String diff = gitHubService.getDiff(prEvent.pullRequest().diffUrl());
-        String review = claudeService.review(diff);
-        commentService.postComment(review, prEvent.repository().fullName(), prEvent.pullRequest().number());
+
+        if(!Objects.equals(prEvent.action(), "closed")){
+            String diff = gitHubService.getDiff(prEvent.pullRequest().diffUrl());
+            String review = claudeService.review(diff);
+            commentService.postComment(review, prEvent.repository().fullName(), prEvent.pullRequest().number());
+        } else {
+            System.out.println(prEvent.pullRequest().title() + " Closed");
+        }
 
         return ResponseEntity.ok().build();
     }

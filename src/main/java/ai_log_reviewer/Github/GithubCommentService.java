@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import java.nio.file.WatchEvent;
 import java.util.Map;
 
 @Service
@@ -15,10 +16,9 @@ public class GithubCommentService {
     private final WebClient webClient;
 
     public GithubCommentService(
-            WebClient.Builder webClientBuilder,
             @Value("${github.token}") String ghToken
     ) {
-        this.webClient = webClientBuilder
+        this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
                 .defaultHeader("Authorization", "Bearer " + ghToken)
                 .defaultHeader("Accept", "application/vnd.github+json")
