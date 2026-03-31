@@ -10,6 +10,7 @@ jobs:
   test:
     name: Test & Build Check
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,7 +18,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'azul'
+          distribution: 'temurin'
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -26,11 +27,14 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build check (no tests atm)
+      - name: Run tests
+        run: ./mvnw test
+
+      - name: Build check (no tests, already ran above)
         run: ./mvnw package -DskipTests
 
   deploy:
-    name: Deploy
+    name: Deploy to Homelab
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: self-hosted
@@ -41,27 +45,24 @@ jobs:
       - name: Write .env file
         run: |
           cat > /opt/ai-code-reviewer/.env << EOF
-          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN_WEBHOOK }}
+          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_KEY }}
+          GITHUB_TOKEN=${{ secrets.PAT }}
           EOF
           chmod 600 /opt/ai-code-reviewer/.env
 
       - name: Stop service
-        run: sudo systemctl stop myapp
+        run: sudo systemctl stop ai-code-reviewer
 
-      - name: Pull & rebuild
+      - name: Build fat JAR
         run: |
-          cd /opt/myapp
+          cd /opt/ai-code-reviewer
           git pull origin main
-          # Your build command here, e.g.:
-          # npm ci && npm run build
-          # pip install -r requirements.txt
-          # go build -o bin/myapp .
+          ./mvnw package -DskipTests
 
       - name: Start service
-        run: sudo systemctl start myapp
+        run: sudo systemctl start ai-code-reviewer
 
       - name: Health check
         run: |
-          sleep 5
-          systemctl is-active --quiet myapp && echo "Service is up" || exit 1
+          sleep 8
+          systemctl is-active --quiet ai-code-reviewer && echo "✅ Service is up" || (journalctl -u ai-code-reviewer --no-pager -n 30 && exit 1)
