@@ -48,18 +48,30 @@ public class WebhookController {
 
         int prNumber = prEvent.pullRequest().number();
         String repoFullName = prEvent.repository().fullName();
-        String diffUrl = prEvent.pullRequest().diffUrl();
 
         log.info("Reviewing PR #{} on {} (action: {})", prNumber, repoFullName, prEvent.action());
 
+        String diff;
+        try {
+            diff = gitHubService.getDiff(prEvent.pullRequest().diffUrl());
+        } catch (Exception e) {
+            log.error("Failed to process PR #{} on {}: {}", prNumber, repoFullName, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
 
-        String diff = gitHubService.getDiff(diffUrl);
         if (diff == null || diff.isBlank()) {
             log.warn("Empty diff for PR #{} on {} — skipping review", prNumber, repoFullName);
             return ResponseEntity.ok().build();
         }
 
-        String review = claudeService.review(diff);
+        String review;
+        try {
+            review = claudeService.review(diff);
+        } catch (Exception e) {
+            log.error("Failed to retrieve review for #{} on {}: {}", prNumber, repoFullName, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+
         if (review == null || review.isBlank()) {
             log.warn("Empty review returned for PR #{} — skipping comment", prNumber);
             return ResponseEntity.ok().build();
