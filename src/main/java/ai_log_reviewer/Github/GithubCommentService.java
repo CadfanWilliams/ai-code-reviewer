@@ -16,7 +16,7 @@ public class GithubCommentService {
     private final WebClient webClient;
 
     public GithubCommentService(
-            @Value("${github.token}") String ghToken
+            @Value("${GITHUB_TOKEN}") String ghToken
     ) {
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
