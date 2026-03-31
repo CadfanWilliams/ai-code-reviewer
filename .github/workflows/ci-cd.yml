@@ -27,10 +27,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Run tests
-        run: ./mvnw test
-
-      - name: Build check (no tests, already ran above)
+      - name: Build check (no tests exist yet
         run: ./mvnw package -DskipTests
 
   deploy:
