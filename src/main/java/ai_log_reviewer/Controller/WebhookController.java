@@ -48,12 +48,16 @@ public class WebhookController {
 
         int prNumber = prEvent.pullRequest().number();
         String repoFullName = prEvent.repository().fullName();
-
+        String diffUrl = prEvent.pullRequest().diffUrl();
         log.info("Reviewing PR #{} on {} (action: {})", prNumber, repoFullName, prEvent.action());
 
+        if(diffUrl.isEmpty()) {
+            log.warn("Empty diff URL for PR #{} on {} — skipping review", prNumber, repoFullName);
+            return ResponseEntity.ok().build();
+        }
         String diff;
         try {
-            diff = gitHubService.getDiff(prEvent.pullRequest().diffUrl());
+            diff = gitHubService.getDiff(diffUrl);
         } catch (Exception e) {
             log.error("Failed to process PR #{} on {}: {}", prNumber, repoFullName, e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
