@@ -28,7 +28,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build check (no tests exist yet
-        run: ./mvnw package -DskipTests
+        run: mvn package -DskipTests
 
   deploy:
     name: Deploy to Homelab
@@ -54,7 +54,7 @@ jobs:
         run: |
           cd /opt/ai-code-reviewer
           git pull origin main
-          ./mvnw package -DskipTests
+          mvn package -DskipTests
 
       - name: Start service
         run: sudo systemctl start ai-code-reviewer
