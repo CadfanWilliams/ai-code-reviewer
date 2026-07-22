@@ -14,7 +14,7 @@ public class ClaudeService {
     private final WebClient webClient;
 
     public ClaudeService(
-            @Value("${claude.api-key}") String apiKey
+            @Value("${ANTHROPIC_API_KEY}") String apiKey
     ) {
         this.webClient = WebClient.builder()
                 .baseUrl("https://api.anthropic.com")

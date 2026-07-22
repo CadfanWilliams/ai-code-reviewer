@@ -12,7 +12,7 @@ public class GithubService {
     private final WebClient webClient;
 
     public GithubService(
-        @Value("${github.token}") String ghToken
+        @Value("${GITHUB_TOKEN}") String ghToken
     ) {
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
