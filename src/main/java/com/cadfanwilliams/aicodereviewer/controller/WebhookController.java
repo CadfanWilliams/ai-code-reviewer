@@ -1,11 +1,15 @@
-package ai_log_reviewer.Controller;
+package com.cadfanwilliams.aicodereviewer.controller;
 
-import ai_log_reviewer.AI.ClaudeService;
-import ai_log_reviewer.Github.GithubCommentService;
-import ai_log_reviewer.Github.GithubService;
-import ai_log_reviewer.Model.PullRequestEvent;
+import com.cadfanwilliams.aicodereviewer.ai.ClaudeService;
+import com.cadfanwilliams.aicodereviewer.github.GithubCommentService;
+import com.cadfanwilliams.aicodereviewer.github.GithubService;
+import com.cadfanwilliams.aicodereviewer.model.PullRequestEvent;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 

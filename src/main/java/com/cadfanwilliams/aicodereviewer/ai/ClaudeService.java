@@ -1,4 +1,4 @@
-package ai_log_reviewer.AI;
+package com.cadfanwilliams.aicodereviewer.ai;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.factory.annotation.Value;

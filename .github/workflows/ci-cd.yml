@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Test & Build Check
+    name: Build Check
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build check (no tests exist yet
+      - name: Build check
         run: mvn package -DskipTests
 
   deploy:

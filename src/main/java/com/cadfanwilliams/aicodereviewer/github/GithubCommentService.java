@@ -1,4 +1,4 @@
-package ai_log_reviewer.Github;
+package com.cadfanwilliams.aicodereviewer.github;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -6,8 +6,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-
-import java.nio.file.WatchEvent;
 import java.util.Map;
 
 @Service

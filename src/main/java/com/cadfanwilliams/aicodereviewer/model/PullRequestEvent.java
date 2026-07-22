@@ -1,4 +1,4 @@
-package ai_log_reviewer.Model;
+package com.cadfanwilliams.aicodereviewer.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

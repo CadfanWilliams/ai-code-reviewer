@@ -1,4 +1,4 @@
-package ai_log_reviewer.Github;
+package com.cadfanwilliams.aicodereviewer.github;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
