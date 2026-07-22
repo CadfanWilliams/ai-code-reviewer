@@ -1,2 +1,10 @@
 #Commiting this file so it is tracked and .gitignore will now work
 #Do not commit this file as it contains sensitive info like API keys
+github:
+  token: <GITHUB_PAT_TOKEN>
+
+claude:
+  api-key: your_claude_key_here
+
+server:
+  port: 8081
